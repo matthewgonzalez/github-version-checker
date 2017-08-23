@@ -4,7 +4,7 @@ semcmp = require 'semver-compare'
 chalk = require 'chalk'
 sprintf = require('sprintf-js').sprintf
 
-baseApiUrl = 'https://api.github.com/repos/%s/releases'
+baseApiUrl = 'https://api.github.com/repos/%s/releases/latest'
 
 module.exports = (options, callback) ->
 
@@ -28,19 +28,16 @@ module.exports = (options, callback) ->
     throw error if error
 
     # parse the response body into an object
-    releases = JSON.parse body
+    release = JSON.parse body
+
+    console.log release
 
     found = false
 
-    # loop through releases
-    # if a remote version is higher than the installed one, the callback
-    # will be called with the release object
-    for release in releases
-      tag = release.tag_name.replace(/[^0-9$.,]/g, '')
-      if semcmp(currentVersion, tag) is -1
-        found = true
-        callback release
-        break
+    tag = release.tag_name.replace(/[^0-9$.,]/g, '')
+    if semcmp(currentVersion, tag) is -1
+      found = true
+      callback release
 
     callback null if not found
 
