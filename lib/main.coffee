@@ -15,7 +15,6 @@ module.exports = (options, callback) ->
   error 'no current version given' if currentVersion is undefined
 
   apiUrl = getBaseApiUrl repo
-  console.log apiUrl
 
   # request options
   reqOpts =
