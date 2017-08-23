@@ -1,10 +1,8 @@
 # require npm modules
 request = require 'request'
 semcmp = require 'semver-compare'
-chalk = require 'chalk'
-sprintf = require('sprintf-js').sprintf
 
-baseApiUrl = 'https://api.github.com/repos/%s/releases/latest'
+getBaseApiUrl = (repo) -> 'https://api.github.com/repos/'+repo+'/releases/latest'
 
 module.exports = (options, callback) ->
 
@@ -16,7 +14,8 @@ module.exports = (options, callback) ->
   error 'no repository specified' if repo is undefined
   error 'no current version given' if currentVersion is undefined
 
-  apiUrl = sprintf baseApiUrl, repo
+  apiUrl = getBaseApiUrl repo
+  console.log apiUrl
 
   # request options
   reqOpts =
@@ -30,17 +29,16 @@ module.exports = (options, callback) ->
     # parse the response body into an object
     release = JSON.parse body
 
-    console.log release
-
     found = false
 
-    tag = release.tag_name.replace(/[^0-9$.,]/g, '')
-    if semcmp(currentVersion, tag) is -1
-      found = true
-      callback release
+    if release.tag_name
+      tag = release.tag_name.replace(/[^0-9$.,]/g, '')
+      if semcmp(currentVersion, tag) is -1
+        found = true
+        callback release
 
     callback null if not found
 
 # error method
 error = (cause) ->
-  throw chalk.bgRed.bold('Error!') + ' ' + cause
+  throw 'Error! ' + cause
